@@ -10,41 +10,53 @@ Persist website memory using PostgreSQL
 Automatically preserve and evolve existing UI/components
 Generate production-ready React TSX code dynamically
 
-**✨ Features**
+## ✨ Features
 
-🤖 AI-powered website generation
-🧠 Conversational memory using PostgreSQL
-🔄 Intelligent website updates without overwriting UI
-⚡ Dynamic React + TypeScript code generation
-🏗️ Create and update website workflows
-🧹 Automatic markdown/code cleanup
-📂 Session-based project persistence
-🔀 Intelligent create vs update routing
-🎨 Modern responsive UI generation
-🛠️ n8n automation workflow architecture
+- 🤖 AI-powered website generation
+- 🧠 Conversational memory using PostgreSQL
+- 🔄 Intelligent website updates without overwriting UI
+- ⚡ Dynamic React + TypeScript code generation
+- 🏗️ Create and update website workflows
+- 🧹 Automatic markdown/code cleanup
+- 📂 Session-based project persistence
+- 🔀 Intelligent create vs update routing
+- 🎨 Modern responsive UI generation
+- 🛠️ n8n automation workflow architecture
 
-🧱 **Architecture**
+---
+
+## 🧱 Architecture
+
+```text
 Webhook
-   ↓
+   │
+   ▼
 IF Node
-├── Create New Website Flow
-│       ↓
-│   AI Website Generator
-│
-└── Update Existing Website Flow
-        ↓
-    Load Existing Memory
-        ↓
-    Format Existing Code
-        ↓
-    AI Website Updater
+ ├── Create New Website Flow
+ │        │
+ │        ▼
+ │   AI Website Generator
+ │
+ └── Update Existing Website Flow
+          │
+          ▼
+   Load Existing Memory
+          │
+          ▼
+   Format Existing Code
+          │
+          ▼
+   AI Website Updater
 
-        ↓
+          │
+          ▼
    Common Code Formatter
-        ↓
+          │
+          ▼
    PostgreSQL Persistence
-        ↓
-   Webhook Response
+          │
+          ▼
+     Webhook Response
 
 ## 🛠️ Tech Stack
 
