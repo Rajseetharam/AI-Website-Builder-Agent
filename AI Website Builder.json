@@ -1,0 +1,319 @@
+{
+  "name": "AI Website Builder",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-website-builder",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f3a2ac86-977f-4226-a0d2-de1915610995",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        0
+      ],
+      "webhookId": "2ae05eab-37e8-4b5f-a52f-f95b45ed856d"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT file_content\nFROM project_files\nWHERE session_id = '{{ $json.body.sessionId }}'\nAND file_path = 'src/pages/Landing.tsx'\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "254a0e10-a607-4e69-b2f1-404536c5c8e7",
+      "name": "Load Conversation Memory",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        544,
+        16
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "rJzUfNcjO2nVJL8B",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const history = items.map(item => ({\n  role: item.json.role,\n  content: item.json.message\n}));\n\nreturn [\n  {\n    json: {\n      sessionId: $('Webhook').first().json.body.sessionId,\n\n      userMessage: $('Webhook').first().json.body.message,\n\n      existingCode: $('Load Conversation Memory').first().json.file_content || \"\",\n\n      history\n    }\n  }\n];"
+      },
+      "id": "42fe3e4a-3112-4ec7-8042-14c8ef77b29a",
+      "name": "Format Memory",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $('Code in JavaScript').item.json.code }}",
+        "options": {}
+      },
+      "id": "4f5750a5-c65d-463c-99b5-f4db6b91c664",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let code =\n  $json.output?.[0]?.content?.[0]?.text ||\n  $json.content?.[0]?.text ||\n  $json.choices?.[0]?.message?.content ||\n  $json.code ||\n  \"\";\n\ncode = code\n  .replace(/```tsx/g, \"\")\n  .replace(/```jsx/g, \"\")\n  .replace(/```javascript/g, \"\")\n  .replace(/```js/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\nreturn [\n  {\n    json: {\n      sessionId: $('Webhook').item.json.body.sessionId,\n      filePath: 'src/pages/Landing.tsx',\n      code: code\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        16
+      ],
+      "id": "cce57f50-3d11-4974-8585-7bd807e0b8d1",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO project_files (\n    session_id,\n    file_path,\n    file_content,\n    updated_at\n)\nVALUES (\n    $1,\n    $2,\n    $3,\n    NOW()\n)\nON CONFLICT (session_id, file_path)\nDO UPDATE SET\n    file_content = EXCLUDED.file_content,\n    updated_at = NOW();",
+        "options": {
+          "queryReplacement": "={{ $json.sessionId }},{{ $json.filePath }},{{ $json.code }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1376,
+        16
+      ],
+      "id": "8f3767a8-58f7-4c7e-93bb-97e86043210e",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "rJzUfNcjO2nVJL8B",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1ba34773-6cf7-43ab-9bdf-abb0b42ab81b",
+              "leftValue": "={{    $json.body.message.toLowerCase().includes('create') \n\n   $json.body.message.toLowerCase().includes('new website') \n\n   $json.body.message.toLowerCase().includes('build') }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        160,
+        0
+      ],
+      "id": "f50d5003-c89a-4b2a-955a-844154ad557e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "GPT-5.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are an expert React + TypeScript + Tailwind developer.\n\nCreate a completely new modern website from scratch.\n\nRules:\n1. Do NOT preserve previous code\n2. Do NOT reference old UI\n3. Return complete executable TSX code\n4. Use responsive modern design\n5. Use TailwindCSS\n6. Return ONLY code\n7. No markdown\n8. No explanations\n9. Include export default component\n10. Create production-quality UI\n\nUser Request:\n{{ $('Webhook').first().json.body.message }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        592,
+        192
+      ],
+      "id": "18ffa712-3f36-4450-88f7-f810850e7a86",
+      "name": "New Website creation",
+      "credentials": {
+        "openAiApi": {
+          "id": "L0UUxwqX8zB4AZW0",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-5.1",
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "=Existing React Code:\n{{ $json.existingCode }}\n\nUser Request:\n{{ $json.userMessage }}\n\nInstructions:\n1. Preserve ALL existing UI and sections\n2. Only apply requested changes\n3. Return COMPLETE updated TSX file\n4. Do NOT remove old code\n5. Return executable React TSX only"
+            },
+            {
+              "content": "={{ $json.userMessage }}"
+            }
+          ]
+        },
+        "simplifyOutput": false,
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "09c35967-0203-4f52-9793-c4dfa3d5ef62",
+      "name": "Updating existing website",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "L0UUxwqX8zB4AZW0",
+          "name": "OpenAI account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Conversation Memory": {
+      "main": [
+        [
+          {
+            "node": "Format Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Memory": {
+      "main": [
+        [
+          {
+            "node": "Updating existing website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "New Website creation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Load Conversation Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Updating existing website": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Website creation": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b0bd1f2d-0d18-4295-946e-b92502f71f59",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "466d0a137a48cb40a7397d8ddc73a4cfbe19d40b597286f183c1a5759a6abeb2"
+  },
+  "id": "1utNWM72cShs9UTS",
+  "tags": []
+}
