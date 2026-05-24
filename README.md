@@ -76,7 +76,7 @@ Generate production-ready React TSX code dynamically
              │ Webhook API Response     │
              └──────────────────────────┘
 
-##  🛠️ **Tech Stack**
+## 🛠️ Tech Stack
 
 | Technology | Purpose |
 |------------|----------|
@@ -87,7 +87,7 @@ Generate production-ready React TSX code dynamically
 | Vite | Frontend tooling |
 | Bolt.new | Live code preview/testing |
 
-## **Setup Instructions**
+## Setup Instructions
 
 1. Clone Repository
 git clone https://github.com/Rajseetharam/AI-Website-Builder-Agent.git
@@ -110,7 +110,7 @@ Configure credentials:
 OpenAI
 PostgreSQL
 
-## 🚀 **API Usage**
+## 🚀 API Usage
 **Create New Website**
 
 {
@@ -125,7 +125,7 @@ PostgreSQL
   "message": "Add testimonials section and dark mode"
 }
 
-## 🧠 **How Memory Works**
+## 🧠How Memory Works
 
 The system stores:
 
