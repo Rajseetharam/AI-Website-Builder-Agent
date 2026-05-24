@@ -1,4 +1,4 @@
-## AI Website Builder Agent 🚀
+# AI Website Builder Agent 🚀
 
 AI-powered React website generator and conversational website editor built using n8n, OpenAI, PostgreSQL, React, and Vite.
 
@@ -10,7 +10,7 @@ Persist website memory using PostgreSQL
 Automatically preserve and evolve existing UI/components
 Generate production-ready React TSX code dynamically
 
-## ✨ Features
+# ✨ Features
 
 - 🤖 AI-powered website generation
 - 🧠 Conversational memory using PostgreSQL
@@ -25,7 +25,7 @@ Generate production-ready React TSX code dynamically
 
 ---
 
-## 🧱 Architecture
+# 🧱 Architecture
 
 ```text
                     ┌──────────────────┐
@@ -76,7 +76,7 @@ Generate production-ready React TSX code dynamically
              │ Webhook API Response     │
              └──────────────────────────┘
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
 | Technology | Purpose |
 |------------|----------|
@@ -87,7 +87,7 @@ Generate production-ready React TSX code dynamically
 | Vite | Frontend tooling |
 | Bolt.new | Live code preview/testing |
 
-## Setup Instructions
+# Setup Instructions
 
 1. Clone Repository
 git clone https://github.com/Rajseetharam/AI-Website-Builder-Agent.git
@@ -110,7 +110,7 @@ Configure credentials:
 OpenAI
 PostgreSQL
 
-## 🚀 API Usage
+# 🚀 API Usage
 **Create New Website**
 
 {
@@ -125,7 +125,7 @@ PostgreSQL
   "message": "Add testimonials section and dark mode"
 }
 
-## 🧠How Memory Works
+# 🧠How Memory Works
 
 The system stores:
 
